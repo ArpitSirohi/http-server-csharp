@@ -28,7 +28,7 @@ var requestLines = request.Split("\r\n");
 var requests = requestLines[0].Split("/");
 var linesPart = requestLines[0].Split(' ');
 var (requestMethod, path, httpVersion) = (linesPart[0], linesPart[1], linesPart[2]);
-string response = path == "/" ? $"{httpVersion} 200OK\r\n\r\n" : $"{httpVersion} 404 Not Found\r\n\r\n";
+string response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" : $"{httpVersion} 404 Not Found\r\n\r\n";
 byte[] responseBytes = Encoding.ASCII.GetBytes(response);
 stream.Write(responseBytes, 0, responseBytes.Length);
 
