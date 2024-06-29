@@ -29,7 +29,7 @@ var requests = requestLines[0].Split("/");
 var linesPart = requestLines[0].Split(' ');
 var (requestMethod, path, httpVersion) = (linesPart[0], linesPart[1], linesPart[2]);
 var contentLength = linesPart[1].Contains("/echo/") ? linesPart[1].Substring(linesPart[1].LastIndexOf("/")) : null; 
-string response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\nContent-Type:text/plain\r\n" : path.Contains("/echo/") ? $"{httpVersion} 200 OK\r\n\r\nContent-Type:text/plain\r\nContent-Length:{contentLength.Length - 1}":$"{httpVersion} 404 Not Found\r\n\r\n";
+string response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\nContent-Type: text/plain\r\n" : path.Contains("/echo/") ? $"{httpVersion} 200 OK\r\n\r\nContent-Type: text/plain\r\nContent-Length: {contentLength.Length - 1}":$"{httpVersion} 404 Not Found\r\n\r\n";
 byte[] responseBytes = Encoding.ASCII.GetBytes(response);
 stream.Write(responseBytes, 0, responseBytes.Length);
 
