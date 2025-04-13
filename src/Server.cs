@@ -35,7 +35,7 @@ if (content.Equals("user-agent", StringComparison.CurrentCultureIgnoreCase))
 {
    // var useragentIndex = requestLines[3].ToLower().IndexOf("user-agent");
     var useragent = requestLines[3].ToLower().Remove(0, 11).Trim();
-    var useragentLength = useragent.Length;
+    int useragentLength = useragent.Length;
     response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
         path.Contains("/user-agent",StringComparison.CurrentCultureIgnoreCase) ? $"{httpVersion} 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {useragentLength}\r\n\r\n{useragent}" : $"{httpVersion} 404 Not Found\r\n\r\n";
 }
