@@ -33,6 +33,9 @@ var content= linesPart[1].Contains("/echo/") ? linesPart[1].Substring(linesPart[
 String response;
 if (content.Equals("user-agent", StringComparison.CurrentCultureIgnoreCase))
 {
+    Console.WriteLine("requestline 0 : - {0}", requestLines[0]);
+    Console.WriteLine("requestline 1 : - {0}", requestLines[1]);
+    Console.WriteLine("requestline 2 : - {0}", requestLines[2]);
     Console.WriteLine("requestline 3 : - {0}", requestLines[3]);
    // var useragentIndex = requestLines[3].ToLower().IndexOf("user-agent");
     var useragent = requestLines[3].ToLower().Remove(0, 11).Trim();
