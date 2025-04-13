@@ -28,7 +28,7 @@ var requestLines = request.Split("\r\n");
 var requests = requestLines[0].Split("/");
 var linesPart = requestLines[0].Split(' ');
 var (requestMethod, path, httpVersion) = (linesPart[0], linesPart[1], linesPart[2]);
-var content= linesPart[1].Contains("/echo/") ? linesPart[1].Substring(linesPart[1].LastIndexOf("/")+1) : linesPart[1].Contains("/user-agent")
+var content= linesPart[1].Contains("/echo/") ? linesPart[1].Substring(linesPart[1].LastIndexOf("/")+1) : linesPart[1].Contains("/user-agent", StringComparison.CurrentCultureIgnoreCase)
     ? linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1) :null;
 String response;
 if (content.Equals("user-agent", StringComparison.CurrentCultureIgnoreCase))
@@ -37,7 +37,7 @@ if (content.Equals("user-agent", StringComparison.CurrentCultureIgnoreCase))
     var useragent = requestLines[3].ToLower().Remove(useragentIndex, 11).Trim();
     var useragentLength = useragent.Length;
     response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
-        path.Contains("/user-agent") ? $"{httpVersion} 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {useragentLength}\r\n\r\n{useragent}" : $"{httpVersion} 404 Not Found\r\n\r\n";
+        path.Contains("/user-agent",StringComparison.CurrentCultureIgnoreCase) ? $"{httpVersion} 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {useragentLength}\r\n\r\n{useragent}" : $"{httpVersion} 404 Not Found\r\n\r\n";
 }
 else
 {
