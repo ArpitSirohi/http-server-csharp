@@ -33,6 +33,7 @@ var content= linesPart[1].Contains("/echo/") ? linesPart[1].Substring(linesPart[
 String response;
 if (!string.IsNullOrWhiteSpace(content) &&content.Equals("user-agent", StringComparison.CurrentCultureIgnoreCase))
 {
+
     var useragent = requestLines[2].ToLower().Remove(0, 11).Trim();
     int useragentLength = useragent.Length;
     response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
