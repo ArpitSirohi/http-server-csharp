@@ -29,7 +29,7 @@ var requests = requestLines[0].Split("/");
 var linesPart = requestLines[0].Split(' ');
 var (requestMethod, path, httpVersion) = (linesPart[0], linesPart[1], linesPart[2]);
 var content= linesPart[1].Contains("/echo/") ? linesPart[1].Substring(linesPart[1].LastIndexOf("/")+1) : linesPart[1].Contains("/user-agent", StringComparison.CurrentCultureIgnoreCase)
-    ? linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1) :null;
+    ? linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1) : null;
 String response;
 if (!string.IsNullOrWhiteSpace(content) &&content.Equals("user-agent", StringComparison.CurrentCultureIgnoreCase))
 {
