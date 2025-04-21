@@ -8,47 +8,57 @@ Console.WriteLine("Logs from your program will appear here!");
 //Uncomment this block to pass the first stage
 
 TcpListener server = new TcpListener(IPAddress.Any, 4221);
+var connectionisOn = true;
 server.Start();
-var client =server.AcceptTcpClient();
-//var socket = server.AcceptSocket(); // wait for client
-// wait for client
-Console.WriteLine("Socket Connected");
-
-string message = "HTTP/1.1 200 OK\r\n\r\n";
-
-byte[] bytes = Encoding.ASCII.GetBytes(message);
-
-NetworkStream stream = client.GetStream();
-byte[] receivedDataBuffer = new byte[256];
-int bytesRead = stream.Read(receivedDataBuffer, 0, receivedDataBuffer.Length);
-
-Console.WriteLine("Received the Data  : {0}", Encoding.ASCII.GetString(receivedDataBuffer, 0,bytesRead));
-var request = Encoding.ASCII.GetString(receivedDataBuffer, 0, bytesRead);
-var requestLines = request.Split("\r\n");
-var requests = requestLines[0].Split("/");
-var linesPart = requestLines[0].Split(' ');
-var (requestMethod, path, httpVersion) = (linesPart[0], linesPart[1], linesPart[2]);
-var content= linesPart[1].Contains("/echo/") ? linesPart[1].Substring(linesPart[1].LastIndexOf("/")+1) : linesPart[1].Contains("/user-agent", StringComparison.CurrentCultureIgnoreCase)
-    ? linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1) : null;
-String response;
-if (!string.IsNullOrWhiteSpace(content) &&content.Equals("user-agent", StringComparison.CurrentCultureIgnoreCase))
+while (connectionisOn)
 {
-
-    var useragent = requestLines[2].ToLower().Remove(0, 11).Trim();
-    int useragentLength = useragent.Length;
-    response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
-        path.Contains("/user-agent",StringComparison.CurrentCultureIgnoreCase) ? $"{httpVersion} 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {useragentLength}\r\n\r\n{useragent}" : $"{httpVersion} 404 Not Found\r\n\r\n";
+    TcpClient client = server.AcceptTcpClient();
+    _ = Task.Run(() => HandleClient(client));
 }
-else
-{
-    response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
-        path.Contains("/echo/") ? $"{httpVersion} 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content.Length}\r\n\r\n{content}" : $"{httpVersion} 404 Not Found\r\n\r\n";
-}
-byte[] responseBytes = Encoding.ASCII.GetBytes(response);
-stream.Write(responseBytes, 0, responseBytes.Length);
+    //var socket = server.AcceptSocket(); // wait for client
+    // wait for client
+    Console.WriteLine("Socket Connected");
 
-client.Close();
-stream.Close();
+    string message = "HTTP/1.1 200 OK\r\n\r\n";
+
+    byte[] bytes = Encoding.ASCII.GetBytes(message);
+
+    Task HandleClient(TcpClient client) {
+        NetworkStream stream = client.GetStream();
+        byte[] receivedDataBuffer = new byte[256];
+        int bytesRead = stream.Read(receivedDataBuffer, 0, receivedDataBuffer.Length);
+
+        Console.WriteLine("Received the Data  : {0}", Encoding.ASCII.GetString(receivedDataBuffer, 0, bytesRead));
+
+        var request = Encoding.ASCII.GetString(receivedDataBuffer, 0, bytesRead);
+        var requestLines = request.Split("\r\n");
+        var requests = requestLines[0].Split("/");
+        var linesPart = requestLines[0].Split(' ');
+        var (requestMethod, path, httpVersion) = (linesPart[0], linesPart[1], linesPart[2]);
+        var content = linesPart[1].Contains("/echo/") ? linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1) : linesPart[1].Contains("/user-agent", StringComparison.CurrentCultureIgnoreCase)
+            ? linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1) : null;
+        String response;
+        if (!string.IsNullOrWhiteSpace(content) && content.Equals("user-agent", StringComparison.CurrentCultureIgnoreCase))
+        {
+
+            var useragent = requestLines[2].ToLower().Remove(0, 11).Trim();
+            int useragentLength = useragent.Length;
+            response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
+                path.Contains("/user-agent", StringComparison.CurrentCultureIgnoreCase) ? $"{httpVersion} 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {useragentLength}\r\n\r\n{useragent}" : $"{httpVersion} 404 Not Found\r\n\r\n";
+        }
+        else
+        {
+            response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
+                path.Contains("/echo/") ? $"{httpVersion} 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content.Length}\r\n\r\n{content}" : $"{httpVersion} 404 Not Found\r\n\r\n";
+        }
+        byte[] responseBytes = Encoding.ASCII.GetBytes(response);
+        stream.Write(responseBytes, 0, responseBytes.Length);
+
+        client.Close();
+
+        stream.Close();
+        return Task.CompletedTask;
+    }
 //socket.Send(bytes);
 server.Stop();
 //socket.Close();
