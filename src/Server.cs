@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 Console.WriteLine("Logs from your program will appear here!");
@@ -46,6 +47,21 @@ while (connectionisOn)
             response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
                 path.Contains("/user-agent", StringComparison.CurrentCultureIgnoreCase) ? $"{httpVersion} 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {useragentLength}\r\n\r\n{useragent}" : $"{httpVersion} 404 Not Found\r\n\r\n";
         }
+        else if (!string.IsNullOrWhiteSpace(linesPart[1]) && linesPart[1].Contains("/files", StringComparison.CurrentCultureIgnoreCase))
+        {
+        var currentdirectory = Environment.CurrentDirectory;
+        var filePath = string.Format("tmp/{0}", linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1));
+        var newfilePath = Path.Join(args[1],"foo");
+        bool isFileExists = false;
+        string text = string.Empty;
+        if (File.Exists(newfilePath))
+        {
+            text = File.ReadAllText(newfilePath);
+            isFileExists = true;
+        }
+
+        response = isFileExists ? $"{httpVersion} 200 OK\r\nContent-Type:application/octet-stream\r\nContent-Length: {text.Length}\r\n\r\n{text}" : $"{httpVersion} 404 Not Found\r\n\r\n";
+    }
         else
         {
             response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
@@ -54,9 +70,8 @@ while (connectionisOn)
         byte[] responseBytes = Encoding.ASCII.GetBytes(response);
         stream.Write(responseBytes, 0, responseBytes.Length);
 
-        client.Close();
-
         stream.Close();
+        client.Close();
         return Task.CompletedTask;
     }
 //socket.Send(bytes);
