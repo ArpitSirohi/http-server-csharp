@@ -51,7 +51,7 @@ while (connectionisOn)
         {
         var currentdirectory = Environment.CurrentDirectory;
         var filePath = string.Format("tmp/{0}", linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1));
-        var newfilePath = Path.Join(args[1],"foo");
+        var newfilePath = Path.Join(args[1], linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1));
         bool isFileExists = false;
         string text = string.Empty;
         if (File.Exists(newfilePath))
