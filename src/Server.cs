@@ -19,7 +19,7 @@ while (connectionisOn)
 }
     //var socket = server.AcceptSocket(); // wait for client
     // wait for client
-    Console.WriteLine("Socket Connected");
+    Console.WriteLine("Socket Connected"); 
 
     string message = "HTTP/1.1 200 OK\r\n\r\n";
 
