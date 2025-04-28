@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -38,10 +39,32 @@ while (connectionisOn)
         var (requestMethod, path, httpVersion) = (linesPart[0], linesPart[1], linesPart[2]);
         var content = linesPart[1].Contains("/echo/") ? linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1) : linesPart[1].Contains("/user-agent", StringComparison.CurrentCultureIgnoreCase)
             ? linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1) : null;
-        String response;
-        if (!string.IsNullOrWhiteSpace(content) && content.Equals("user-agent", StringComparison.CurrentCultureIgnoreCase))
+        String response = $"{httpVersion} 404 Not Found\r\n\r\n";
+        if (requestMethod.Equals("POST", StringComparison.CurrentCultureIgnoreCase))
         {
-
+            var (contentType, contentLength,contentData ) = (requestLines[4], requestLines[5].ElementAt(requestLines[5].Length - 1), requestLines[7]);
+            var newfilePath = Path.Join(args[1], linesPart[1].Substring(1));
+        try
+        {
+            string directoryPath = Path.GetDirectoryName(newfilePath);
+            if (!Directory.Exists(directoryPath))
+                Directory.CreateDirectory(directoryPath);
+            // Create the file, or overwrite if the file exists.
+            using (FileStream fs = File.Create(newfilePath))
+            {
+                byte[] info = new UTF8Encoding(true).GetBytes(contentData);
+                // Add some information to the file.
+                fs.Write(info, 0, info.Length);
+            }
+            response = "HTTP/1.1 201 Created\r\n\r\n";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("The file is not able to create as the file already exists{0}",ex.Message);
+        }
+        }
+        else if (!string.IsNullOrWhiteSpace(content) && content.Equals("user-agent", StringComparison.CurrentCultureIgnoreCase))
+        { 
             var useragent = requestLines[2].ToLower().Remove(0, 11).Trim();
             int useragentLength = useragent.Length;
             response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
@@ -61,12 +84,13 @@ while (connectionisOn)
         }
 
         response = isFileExists ? $"{httpVersion} 200 OK\r\nContent-Type:application/octet-stream\r\nContent-Length: {text.Length}\r\n\r\n{text}" : $"{httpVersion} 404 Not Found\r\n\r\n";
-    }
+        }
         else
         {
             response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
                 path.Contains("/echo/") ? $"{httpVersion} 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content.Length}\r\n\r\n{content}" : $"{httpVersion} 404 Not Found\r\n\r\n";
         }
+
         byte[] responseBytes = Encoding.ASCII.GetBytes(response);
         stream.Write(responseBytes, 0, responseBytes.Length);
 
