@@ -42,10 +42,12 @@ while (connectionisOn)
         String response = $"{httpVersion} 404 Not Found\r\n\r\n";
         if (requestMethod.Equals("POST", StringComparison.CurrentCultureIgnoreCase))
         {
-            var (contentType, contentLength,contentData ) = (requestLines[4], requestLines[5].ElementAt(requestLines[5].Length - 1), requestLines[7]);
+        Console.WriteLine("Started POST Response");
+        var (contentType, contentLength,contentData ) = (requestLines[4], requestLines[5].ElementAt(requestLines[5].Length - 1), requestLines[7]);
             var newfilePath = Path.Join(args[1], linesPart[1].Substring(1));
         try
         {
+            Console.WriteLine("Creating file in {0}",newfilePath);
             string directoryPath = Path.GetDirectoryName(newfilePath);
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
@@ -55,6 +57,8 @@ while (connectionisOn)
                 byte[] info = new UTF8Encoding(true).GetBytes(contentData);
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
+                Console.WriteLine("File Creation Successfull{0}", newfilePath);
+
             }
             response = "HTTP/1.1 201 Created\r\n\r\n";
         }
@@ -90,7 +94,7 @@ while (connectionisOn)
             response = path == "/" ? $"{httpVersion} 200 OK\r\n\r\n" :
                 path.Contains("/echo/") ? $"{httpVersion} 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content.Length}\r\n\r\n{content}" : $"{httpVersion} 404 Not Found\r\n\r\n";
         }
-
+        Console.WriteLine("Creating response for request {0}", response);
         byte[] responseBytes = Encoding.ASCII.GetBytes(response);
         stream.Write(responseBytes, 0, responseBytes.Length);
 
