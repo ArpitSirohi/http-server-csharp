@@ -27,25 +27,32 @@ while (connectionisOn)
 
     Task HandleClient(TcpClient client) {
         NetworkStream stream = client.GetStream();
-        byte[] receivedDataBuffer = new byte[256];
+        byte[] receivedDataBuffer = new byte[4096];
         int bytesRead = stream.Read(receivedDataBuffer, 0, receivedDataBuffer.Length);
 
         Console.WriteLine("Received the Data  : {0}", Encoding.ASCII.GetString(receivedDataBuffer, 0, bytesRead));
 
         var request = Encoding.ASCII.GetString(receivedDataBuffer, 0, bytesRead);
-        var requestLines = request.Split("\r\n");
+        
+        int headerEndIndex = request.IndexOf("\r\n\r\n", StringComparison.Ordinal);
+        string headerPart = request.Substring(0, headerEndIndex);
+        string body = request.Substring(headerEndIndex + 4);
+        var requestLines = headerPart.Split("\r\n");
         var requests = requestLines[0].Split("/");
         var linesPart = requestLines[0].Split(' ');
         var (requestMethod, path, httpVersion) = (linesPart[0], linesPart[1], linesPart[2]);
         var content = linesPart[1].Contains("/echo/") ? linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1) : linesPart[1].Contains("/user-agent", StringComparison.CurrentCultureIgnoreCase)
             ? linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1) : null;
         String response = $"{httpVersion} 404 Not Found\r\n\r\n";
+        
+         linesPart = requestLines[0].Split(' ');
+
         if (requestMethod.Equals("POST", StringComparison.CurrentCultureIgnoreCase))
         {
         Console.WriteLine("Started POST Response");
         Console.WriteLine("Started response for server");
-        Console.WriteLine("Content is as follows {0}",requestLines[7]);
-        var (contentType, contentLength,contentData ) = (requestLines[5], requestLines[4].ElementAt(requestLines[4].Length - 1), requestLines[7]);
+        //Console.WriteLine("Content is as follows {0}",requestLines[7]);
+        var (contentType, contentLength,contentData ) = (requestLines[5], requestLines[4].ElementAt(requestLines[4].Length - 1), body);
             var newfilePath = Path.Join(args[1], linesPart[1].Substring(1));
         try
         {
