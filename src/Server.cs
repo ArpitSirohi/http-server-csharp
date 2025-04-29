@@ -43,6 +43,8 @@ while (connectionisOn)
         if (requestMethod.Equals("POST", StringComparison.CurrentCultureIgnoreCase))
         {
         Console.WriteLine("Started POST Response");
+        Console.WriteLine("Started response for server");
+        Console.WriteLine("Content is as follows {0}",requestLines[7]);
         var (contentType, contentLength,contentData ) = (requestLines[5], requestLines[4].ElementAt(requestLines[4].Length - 1), requestLines[7]);
             var newfilePath = Path.Join(args[1], linesPart[1].Substring(1));
         try
