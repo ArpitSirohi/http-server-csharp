@@ -43,7 +43,7 @@ while (connectionisOn)
         if (requestMethod.Equals("POST", StringComparison.CurrentCultureIgnoreCase))
         {
         Console.WriteLine("Started POST Response");
-        var (contentType, contentLength,contentData ) = (requestLines[4], requestLines[5].ElementAt(requestLines[5].Length - 1), requestLines[7]);
+        var (contentType, contentLength,contentData ) = (requestLines[5], requestLines[4].ElementAt(requestLines[4].Length - 1), requestLines[7]);
             var newfilePath = Path.Join(args[1], linesPart[1].Substring(1));
         try
         {
@@ -57,7 +57,7 @@ while (connectionisOn)
                 byte[] info = new UTF8Encoding(true).GetBytes(contentData);
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
-                Console.WriteLine("File Creation Successfull{0}", newfilePath);
+                Console.WriteLine("File Creation Successfull {0}", newfilePath);
 
             }
             response = "HTTP/1.1 201 Created\r\n\r\n";
