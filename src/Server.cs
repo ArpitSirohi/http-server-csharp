@@ -53,7 +53,7 @@ while (connectionisOn)
         Console.WriteLine("Started response for server");
         //Console.WriteLine("Content is as follows {0}",requestLines[7]);
         var contentData = (body);
-            var newfilePath = Path.Join(args[1], linesPart[1].Substring(1));
+            var newfilePath = Path.Join(args[1], linesPart[1].Substring(linesPart[1].LastIndexOf("/") + 1));
         try
         {
             Console.WriteLine("Creating file in {0}",newfilePath);
